@@ -6,16 +6,18 @@ DEBUG = False
 MAX_SPEED = 3
 NUM_PARTICLES = 500
 FPS = 30
-EXPLOSION_TIME_S = 5
+EXPLOSION_TIME_S = 4
 
 color_background = pg.Color('black')
 radius = 2
 
 pg.init()
 pg.display.set_caption("Explosion!")
-
 screen_length = 750
 screen = pg.display.set_mode((screen_length, screen_length))
+
+boom = pg.mixer.Sound("./explosion_sound.wav")
+sound_on = True
 
 class Particle():
     def __init__(self):
@@ -73,13 +75,14 @@ if __name__ == '__main__':
 
             particle.set_vals(origin, vel, speed, color)
         
+        if sound_on: boom.play()
         for i in range(FPS * EXPLOSION_TIME_S):
             screen.fill(color_background)
 
             for particle in particles:
                 pg.draw.circle(screen, particle.get_color(), particle.get_spot(), radius)
                 particle.update()
-                if i % 6 == 0:
+                if i % 4 == 0:
                     particle.transparency_update(1)
             clock.tick(FPS)
 
