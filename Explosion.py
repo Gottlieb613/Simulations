@@ -17,6 +17,7 @@ screen_length = 750
 screen = pg.display.set_mode((screen_length, screen_length))
 
 boom = pg.mixer.Sound("./explosion_sound.wav")
+boom.set_volume(.3)
 sound_on = True
 
 class Particle():
@@ -37,6 +38,8 @@ class Particle():
     def transparency_update(self, amount):
         if self.color.a >= amount:
             self.color.a -= amount
+        else:
+            self.color.a = 0
         self.color = self.color.premul_alpha()
     
     def get_spot(self):
@@ -75,7 +78,7 @@ if __name__ == '__main__':
 
             particle.set_vals(origin, vel, speed, color)
         
-        if sound_on: boom.play()
+        if sound_on: boom.play(); boom.fadeout(EXPLOSION_TIME_S * 1000)
         for i in range(FPS * EXPLOSION_TIME_S):
             screen.fill(color_background)
 
