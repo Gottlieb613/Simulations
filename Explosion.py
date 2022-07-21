@@ -4,18 +4,20 @@ import math
 
 DEBUG = False
 MAX_SPEED = 3
-NUM_PARTICLES = 200
+NUM_PARTICLES = 500
 FPS = 30
 EXPLOSION_TIME_S = 4
-GRAVITY = True
 
 color_background = pg.Color('black')
 radius = 2
+gravity = False
 
 pg.init()
 pg.display.set_caption("Explosion!")
 screen_length = 750
 screen = pg.display.set_mode((screen_length, screen_length))
+
+selection_font = pg.font.SysFont("Arial", 30, True)
 
 boom = pg.mixer.Sound("./explosion_sound.wav")
 boom.set_volume(.3)
@@ -33,7 +35,7 @@ class Particle():
         self.color = color
     
     def update(self):
-        if GRAVITY:
+        if gravity:
             self.dir[1] += .02
         self.x += self.dir[0] * self.speed
         self.y += self.dir[1] * self.speed
@@ -51,16 +53,44 @@ class Particle():
     def get_color(self):
         return self.color
 
-def color_str(color):
-    return f"({color.r}, {color.g}, {color.b})"
+def write_text(text, x, y):
+    to_write = selection_font.render(text, 1, pg.Color("white"))
+    screen.blit(to_write, (x - 60, y))
 
-def two_dec(num):
-    return "{:.2f}".format(num)
+
+
 
 if __name__ == '__main__':
     clock = pg.time.Clock()
-    screen.fill(color_background)
-    print("TEST")
+
+    selecting = True
+    was_pressed = False
+    while selecting:
+        screen.fill(color_background)
+
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                sys.exit()
+
+        if gravity:
+            grav_status = "on"
+        else:
+            grav_status = "off"
+        write_text(f"Gravity: {grav_status}", screen_length//2, screen_length//4)
+        write_text("Start", screen_length//2, 3 * screen_length//4)
+        pg.draw.line(screen, pg.Color("white"), (0, screen_length//2), (screen_length, screen_length//2))
+
+        if pg.mouse.get_pressed()[0]:
+            was_pressed = True
+        if not pg.mouse.get_pressed()[0] and was_pressed:
+            was_pressed = False
+
+            mouse_x, mouse_y = pg.mouse.get_pos()
+            if 0 <= mouse_y <= screen_length//2:
+                gravity = not gravity
+            else:
+                selecting = False
+        pg.display.flip()
 
     while 1:
         for event in pg.event.get():
@@ -71,7 +101,7 @@ if __name__ == '__main__':
         particles = [Particle() for _ in range(NUM_PARTICLES)]
 
         for particle in particles:
-            if GRAVITY:
+            if gravity:
                 angle = 360 - random.randint(30, 150)
             else:
                 angle = random.randint(0, 360)
