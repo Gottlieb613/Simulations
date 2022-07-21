@@ -4,9 +4,10 @@ import math
 
 DEBUG = False
 MAX_SPEED = 3
-NUM_PARTICLES = 500
+NUM_PARTICLES = 200
 FPS = 30
 EXPLOSION_TIME_S = 4
+GRAVITY = True
 
 color_background = pg.Color('black')
 radius = 2
@@ -32,6 +33,8 @@ class Particle():
         self.color = color
     
     def update(self):
+        if GRAVITY:
+            self.dir[1] += .02
         self.x += self.dir[0] * self.speed
         self.y += self.dir[1] * self.speed
     
@@ -68,9 +71,12 @@ if __name__ == '__main__':
         particles = [Particle() for _ in range(NUM_PARTICLES)]
 
         for particle in particles:
-            angle = random.randint(0, 360)
+            if GRAVITY:
+                angle = 360 - random.randint(30, 150)
+            else:
+                angle = random.randint(0, 360)
             rad = math.radians(angle)
-            vel = (math.cos(math.radians(angle)), math.sin(math.radians(angle)))
+            vel = [math.cos(math.radians(angle)), math.sin(math.radians(angle))]
 
             speed = random.random() * MAX_SPEED
 
